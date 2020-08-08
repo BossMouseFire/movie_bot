@@ -50,6 +50,7 @@ def get_content(html):
 
         buf.append({
             'name': item.find('a').get('data-gtm-ec-name'),
+            'href': item.find('a').get('href'),
             'sessions': infoSession
         })
     return buf
@@ -63,7 +64,7 @@ def cinema(numberDay):
         dayNormal = str(day)
     url = 'https://kinoteatr.ru/raspisanie-kinoteatrov/ulyanovsk/akvamoll/?date=' + type_time("%Y") + "-" + type_time("%m") + "-" + dayNormal
     html = get_html(url)
-    print(get_content(html))
+    return get_content(html)
 
 
 if __name__ == "cinema":
