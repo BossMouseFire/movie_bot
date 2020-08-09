@@ -7,14 +7,17 @@ from vkbottle.rule import AbstractRule
 dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
 if os.path.exists(dotenv_path):
     load_dotenv(dotenv_path)
+# Авторизация бота
 TOKEN = os.environ.get("SECRET_KEY")
 bot = Bot(TOKEN)
+# Переменные для разработки
 buffer_name = {}
 days = ['Сегодня', 'Завтра', 'Послезавтра']
 day_num = 0
 session_array = []
 session_full = {}
 name = []
+recent_actions = []
 
 
 # Клавиатуры
@@ -31,11 +34,13 @@ def keyboard_cinema(index):
             check = 1
             keyboard.add_row()
             keyboard.add_button(Text(buf['name']), color="positive")
-
+    keyboard.add_row()
+    keyboard.add_button(Text('Назад'), color="secondary")
     return keyboard.generate()
 
 
-def keyboard(num):
+def keyboard_ses(num):
+
     check = 0
     buffer_cinema = cinema(day_num)
     sessions = buffer_cinema[num]['sessions']
@@ -49,7 +54,8 @@ def keyboard(num):
             check = 1
             keyboard.add_row()
             keyboard.add_button(Text('{time}({price}, {format})'.format(time=session['time'], price=session['price'], format=session['format'])), color="positive")
-
+    keyboard.add_row()
+    keyboard.add_button(Text('Назад'), color="secondary")
     return keyboard.generate()
 
 
@@ -96,12 +102,14 @@ async def choose_film(ans: Message):
         )
         name.append(buf['name'])
 
+    recent_actions.append(ans.text)
+
 
 @bot.on.message(MovieCheck())
 async def choose_session(ans: Message):
     global session_array
     buffer_cinema = cinema(day_num)
-    await ans("Выберите время сеанса", keyboard=keyboard(buffer_name[str(ans.text)]))
+    await ans("Выберите время сеанса", keyboard=keyboard_ses(buffer_name[str(ans.text)]))
     for i, buf in enumerate(buffer_cinema, start=0):
         sessions = buf['sessions']
         for j, session in enumerate(sessions, start=0):
@@ -110,6 +118,10 @@ async def choose_session(ans: Message):
             session_full.update(
                 {ses: i}
             )
+    if recent_actions[-1] in name:
+        pass
+    else:
+        recent_actions.append(ans.text)
 
 
 @bot.on.message(SessionCheck())
@@ -118,5 +130,23 @@ async def full_info(ans: Message):
     buffer_cinema = cinema(day_num)
     num = session_full[ans.text]
     href = buffer_cinema[num]['href']
+    if recent_actions[-1] in session_array:
+        pass
+    else:
+        recent_actions.append(ans.text)
     return href
+
+
+@bot.on.message(text="Назад", lower=True)
+async def back(ans: Message):
+    if recent_actions[-1] in session_array:
+        await ans('Выберите фильм', keyboard=keyboard_cinema(day_num))
+        recent_actions.pop(-1)
+    elif recent_actions[-1] in name:
+        await ans('Выберите фильм', keyboard=keyboard_cinema(day_num))
+        recent_actions.pop(-1)
+    elif recent_actions[-1] in days:
+        await ans('Выберите день', keyboard=day())
+        recent_actions.pop(-1)
+    print(recent_actions)
 bot.run_polling()
