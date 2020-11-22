@@ -85,6 +85,4 @@ def transliterate(string):
 
     return string
 
-
-if __name__ == "transliterate":
-    transliterate()
+print(transliterate('Москва'))

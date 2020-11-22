@@ -29,7 +29,7 @@ def get_html(url):
     return r
 
 
-def get_content(html):
+def get_content_cinema(html):
     soup = bS(html, 'lxml')
     buf = []
     items = soup.find_all('div', class_="shedule_movie bordered gtm_movie")
@@ -56,16 +56,34 @@ def get_content(html):
     return buf
 
 
-def cinema(numberDay):
+def get_theater(city):
+    if city == 'Moskva':
+        url = 'https://kinoteatr.ru/raspisanie-kinoteatrov/'
+    else:
+        url = 'https://kinoteatr.ru/raspisanie-kinoteatrov/{city}'.format(city=city)
+    print(url)
+    html = get_html(url)
+    soup = bS(html, 'lxml')
+    items = soup.find_all('div', class_="col-md-12 cinema_card")
+    buf = []
+    for item in items:
+        buf.append(
+            {
+                'name':  item.find('div', class_='cinema_card_wrap_description').find('a').find('h3').get_text(strip=True),
+                'href': item.find('div', class_='cinema_card_wrap_description').find('a').get('href')
+            }
+        )
+    return buf
+
+
+def cinema(numberDay, URL):
     day = int(type_time('%d')) + numberDay
     if day < 10:
         dayNormal = '0' + str(day)
     else:
         dayNormal = str(day)
-    url = 'https://kinoteatr.ru/raspisanie-kinoteatrov/ulyanovsk/akvamoll/?date=' + type_time("%Y") + "-" + type_time("%m") + "-" + dayNormal
+
+    url = URL + '?date=' + type_time("%Y") + "-" + type_time("%m") + "-" + dayNormal
     html = get_html(url)
-    return get_content(html)
+    return get_content_cinema(html)
 
-
-if __name__ == "cinema":
-    cinema()
