@@ -42,20 +42,23 @@ def keyboard_main():
 def keyboard_cinema(index, URL):
     check = 0
     buffer = cinema(index, URL)
-    print(index)
-    keyboard = Keyboard()
-    keyboard.add_row()
-    for buf in buffer:
-        check += 1
-        if check <= 3:
-            keyboard.add_button(Text(buf['name']), color="positive")
-        else:
-            check = 1
-            keyboard.add_row()
-            keyboard.add_button(Text(buf['name']), color="positive")
-    keyboard.add_row()
-    keyboard.add_button(Text('Назад'), color="secondary")
-    return keyboard.generate()
+    if len(buffer) != 0:
+        keyboard = Keyboard()
+        keyboard.add_row()
+        for buf in buffer:
+            check += 1
+            if check <= 3:
+                keyboard.add_button(Text(buf['name']), color="positive")
+            else:
+                check = 1
+                keyboard.add_row()
+                keyboard.add_button(Text(buf['name']), color="positive")
+        keyboard.add_row()
+        keyboard.add_button(Text('Назад'), color="secondary")
+        return keyboard.generate()
+
+    else:
+        return 'В данный момент доступных сеансов нет'
 
 
 def keyboard_ses(num, URL):
@@ -154,7 +157,8 @@ class TheaterCheck(AbstractRule):
 async def begin(ans: Message):
     check_user = check_person(ans.from_id)
     if check_user == 1:
-        await ans('Главное меню', keyboard=keyboard_main())
+        await ans('Вы находитесь в главном меню'
+                  , keyboard=keyboard_main())
     else:
         await ans('Выберите город, в котором вы находитесь', keyboard=keyboard_city(0, 10))
         await ans('Выберите город, в котором вы находитесь', keyboard=keyboard_city(11, 21))
@@ -164,7 +168,8 @@ async def begin(ans: Message):
 @bp.on.message(text=cities, lower=True)
 async def choose(ans: Message):
     information(ans.from_id, ans.text)
-    await ans('Главное меню', keyboard=keyboard_main())
+    await ans('Ваши настройки сохранены. \
+              Нажмте кнопку «Кино», чтобы продолжить.', keyboard=keyboard_main())
 
 
 @bp.on.message(text=days, lower=True)
