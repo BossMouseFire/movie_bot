@@ -2,7 +2,7 @@ from vkbottle.bot import Blueprint, Message
 from parsers.parserCinema import cinema, get_theater
 from vkbottle.api.keyboard import Keyboard, Text
 from vkbottle.rule import AbstractRule
-from botDB import information, check_person, get_city, update_city
+from botDB import information, check_person, get_city
 from anything.translit import transliterate
 bp = Blueprint(name="Синема Парк")
 
