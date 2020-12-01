@@ -1,4 +1,3 @@
 bs4
 vkbottle
 requests
-dotenv
