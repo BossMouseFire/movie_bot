@@ -2,3 +2,4 @@ bs4
 vkbottle
 requests
 random-user-agent
+python-dotenv
