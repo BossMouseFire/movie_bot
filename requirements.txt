@@ -4,3 +4,4 @@ requests
 random-user-agent
 python-dotenv
 lxml
+-upgrade
